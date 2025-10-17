@@ -83,4 +83,36 @@ final class JUnitTest extends TestCase
         self::assertCount(2, $testSuite->suites['ParaTest\Tests\fixtures\github\GH997\SuccessfulTests']->cases);
         self::assertEquals(2, $testSuite->suites['ParaTest\Tests\fixtures\github\GH997\SuccessfulTests']->tests);
     }
+
+    public function testMergeEmptyJunitLogs(): void
+    {
+        $tmpDir = (new TmpDirCreator())->create();
+
+        // Test with empty array of junit files
+        $testSuite = (new LogMerger())->merge([]);
+        self::assertInstanceOf(TestSuite::class, $testSuite);
+        self::assertEquals('', $testSuite->name);
+        self::assertEquals(0, $testSuite->tests);
+        self::assertEquals(0, $testSuite->assertions);
+        self::assertEquals(0, $testSuite->failures);
+        self::assertEquals(0, $testSuite->errors);
+        self::assertEquals(0, $testSuite->skipped);
+        self::assertEquals(0.0, $testSuite->time);
+        self::assertEquals('', $testSuite->file);
+        self::assertSame([], $testSuite->suites);
+        self::assertSame([], $testSuite->cases);
+
+        // Test that it can be written to XML
+        $outputFile = $tmpDir . '/empty_result.xml';
+        (new Writer())->write(
+            $testSuite,
+            $outputFile,
+        );
+
+        $xml = file_get_contents($outputFile);
+        self::assertNotFalse($xml);
+        self::assertStringContainsString('<testsuites', $xml);
+        self::assertStringContainsString('tests="0"', $xml);
+        self::assertStringContainsString('assertions="0"', $xml);
+    }
 }

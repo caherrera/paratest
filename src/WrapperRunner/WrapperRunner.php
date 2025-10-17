@@ -369,9 +369,6 @@ final class WrapperRunner implements RunnerInterface
         }
 
         $testSuite = (new LogMerger())->merge($this->junitFiles);
-        if ($testSuite === null) {
-            return;
-        }
 
         (new Writer())->write(
             $testSuite,
