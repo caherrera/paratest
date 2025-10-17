@@ -14,7 +14,7 @@ use SplFileInfo;
 final readonly class LogMerger
 {
     /** @param list<SplFileInfo> $junitFiles */
-    public function merge(array $junitFiles): ?TestSuite
+    public function merge(array $junitFiles): TestSuite
     {
         $mainSuite = null;
         foreach ($junitFiles as $junitFile) {
@@ -61,6 +61,22 @@ final readonly class LogMerger
             }
 
             $mainSuite = $mainSuite->mergeWith($otherSuite);
+        }
+
+        // Return an empty TestSuite if no valid junit files were found
+        if ($mainSuite === null) {
+            return new TestSuite(
+                '',
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.0,
+                '',
+                [],
+                [],
+            );
         }
 
         return $mainSuite;
